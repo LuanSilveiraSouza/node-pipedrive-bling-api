@@ -1,24 +1,37 @@
-import { CronJob } from 'cron';
 import PipedriveApi from '../services/PipedriveApi';
 
-export const GetPipedriveDealsJob = new CronJob(
-	'0 * * * * *',
-	async () => {
-		console.log('Pipedrive CronJob');
+import { IDeal } from '../types/deal';
 
-		try {
-			const response = await PipedriveApi.get(
-				`/deals?api_token=${process.env.PIPEDRIVE_KEY}`
-			);
+const GetPipedriveDealsJob = async (): Promise<IDeal[]> => {
+	let deals: IDeal[] = [];
 
-			if (response.status === 200) {
-				console.log(response.data?.data);
-			}
-		} catch (error) {
-			console.log(error);
+	try {
+		const response = await PipedriveApi.get(
+			`/deals?api_token=${process.env.PIPEDRIVE_KEY}`
+		);
+
+		if (response.status === 200) {
+			deals = response.data?.data
+				.filter((deal: any) => deal.status === 'won')
+				.map(
+					(deal: any): IDeal => {
+						return {
+							id: deal.id,
+							owner: deal.owner_name,
+							person_name: deal.person_id?.name,
+							person_email: deal.person_id?.email[0]?.value,
+							person_phone: deal.person_id?.phone[0]?.value,
+							price: deal.weighted_value,
+							date: deal.update_time,
+						};
+					}
+				);
 		}
-	},
-	null,
-	true,
-	'America/Sao_Paulo'
-);
+	} catch (error) {
+		console.log(error);
+	}
+
+	return deals;
+};
+
+export default GetPipedriveDealsJob;

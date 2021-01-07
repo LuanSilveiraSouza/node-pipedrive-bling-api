@@ -3,9 +3,7 @@ import express from 'express';
 import MongoConnection from './database/MongoConnection';
 import job from './jobs';
 
-const database = new MongoConnection();
-
-database
+MongoConnection
 	.connect(
 		process.env.MONGO_USER || '',
 		encodeURIComponent(process.env.MONGO_PASS || ''),

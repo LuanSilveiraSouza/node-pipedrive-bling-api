@@ -1,4 +1,5 @@
 import { Collection } from 'mongodb';
+import { cursorTo } from 'readline';
 import { IDeal } from '../types/deal';
 import MongoConnection from './MongoConnection';
 
@@ -22,6 +23,23 @@ const DealRepository = {
 			return false;
 		}
 	},
+
+	async list(): Promise<any[]> {
+		const dealCollection: Collection = await MongoConnection.getCollection(
+			'deals'
+		);
+
+		try {
+			const deals = await dealCollection.find({}).toArray();
+
+			console.log(deals);
+
+			return deals;
+		} catch (error) {
+			console.log(error);
+			return [];
+		}
+	}
 };
 
 export default DealRepository;

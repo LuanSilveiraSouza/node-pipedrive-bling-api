@@ -6,19 +6,21 @@ import PostBlingDeal from './PostBlingDeal';
 import { IDeal } from '../types/deal';
 
 const job = new CronJob(
-	'1 * * * * *',
+	'0 0 */1 * * *',
 	async () => {
+		console.log('CronJob');
+
 		const deals = await GetPipedriveDeals();
 
-		deals.forEach(async (deal: IDeal) => {
-			const inserted = await DealRepository.create(deals[0]);
+		await Promise.all(deals.map(async (deal: IDeal) => {
+			const inserted = await DealRepository.create(deal);
+
+			console.log(deal.id);
 
 			if (inserted) {
 				await PostBlingDeal(deal);
-
-				console.log('inserted ' + deal.id);
 			}
-		});
+		}));
 	},
 	null,
 	true,

@@ -1,6 +1,6 @@
 require('dotenv').config();
-import express from 'express';
 import MongoConnection from './database/MongoConnection';
+import app from './app';
 import job from './jobs';
 
 MongoConnection
@@ -10,12 +10,6 @@ MongoConnection
 		process.env.MONGO_DATABASE || ''
 	)
 	.then(() => {
-		const app = express();
-
-		app.get('/', (req, res) => {
-			res.status(200).json({ msg: 'Hello World!' });
-		});
-
 		job.start();
 
 		const PORT = process.env.PORT || 3030;

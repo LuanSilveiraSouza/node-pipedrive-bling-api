@@ -8,14 +8,10 @@ import { IDeal } from '../types/deal';
 const job = new CronJob(
 	'0 0 */1 * * *',
 	async () => {
-		console.log('CronJob');
-
 		const deals = await GetPipedriveDeals();
 
 		await Promise.all(deals.map(async (deal: IDeal) => {
 			const inserted = await DealRepository.create(deal);
-
-			console.log(deal.id);
 
 			if (inserted) {
 				await PostBlingDeal(deal);

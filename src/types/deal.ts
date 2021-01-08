@@ -7,4 +7,8 @@ export interface IDeal {
     price: number;
     date: string;
 }
-                            
+              
+export interface IDealQuery {
+    date?: string;
+    price?: string;
+}

@@ -3,8 +3,8 @@ import DealRepository from '../database/DealRepository';
 
 class DealController {
 	static async list(request: Request, response: Response) {
-		try {
-			const deals = await DealRepository.list();
+        try {
+			const deals = await DealRepository.list({...request.query});
 
 			if (deals.length > 0) {
 				return response.status(200).json(deals);

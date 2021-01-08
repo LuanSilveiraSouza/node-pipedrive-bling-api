@@ -1,6 +1,5 @@
 import { Collection } from 'mongodb';
-import { cursorTo } from 'readline';
-import { IDeal } from '../types/deal';
+import { IDeal, IDealQuery } from '../types/deal';
 import MongoConnection from './MongoConnection';
 
 const DealRepository = {
@@ -24,22 +23,39 @@ const DealRepository = {
 		}
 	},
 
-	async list(): Promise<any[]> {
+	async list(query?: IDealQuery): Promise<any[]> {
 		const dealCollection: Collection = await MongoConnection.getCollection(
 			'deals'
 		);
 
 		try {
-			const deals = await dealCollection.find({}).toArray();
+			let deals;
 
-			console.log(deals);
+			if (!query || Object.keys(query).length === 0) {
+				deals = await dealCollection.find({}).toArray();
+			} else {
+				const _id: IDealQuery = {};
+				query.price === 'true' ? (_id.price = '$price') : null;
+				query.date === 'true' ? (_id.date = '$date') : null;
+
+				deals = await dealCollection
+					.aggregate([
+						{
+							$group: {
+								_id,
+								deals: { $push: '$$ROOT' },
+							},
+						},
+					])
+					.toArray();
+			}
 
 			return deals;
 		} catch (error) {
 			console.log(error);
 			return [];
 		}
-	}
+	},
 };
 
 export default DealRepository;

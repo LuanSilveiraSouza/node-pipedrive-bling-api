@@ -22,4 +22,4 @@ MongoConnection
 
 		app.listen(PORT, () => console.log(`Server started at port ${PORT}`));
 	})
-	.catch((error) => console.error(error));
+	.catch((error) => console.error(error)); 
